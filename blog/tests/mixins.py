@@ -16,8 +16,6 @@ class TestDataMixin:
         permission = Permission.objects.get(name='create update and delete blogs')
         cls.user.user_permissions.add(permission)
         cls.user1.user_permissions.add(permission)
-        cls.user1.save()
-        cls.user.save()
 
         # create blog posts
         cls.blog1 = Blog.objects.create(blogger=cls.user, content='x'*128, title='blog post')
