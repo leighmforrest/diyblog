@@ -12,7 +12,11 @@
     <h2>Comments</h2>
     {% for comment in blog.comments.all %}
         <div>
-            {{ comment.user }} ({{ comment.created_at }}) - {{ comment.content }}
+            {{ comment.user.username }} ({{ comment.created_at }}) - {{ comment.content }}
+            <br>
+            {% if user == comment.user %}
+            This user can edit the comment.
+            {% endif %}
         </div>
     {% endfor %}
     {% if user.is_authenticated %}

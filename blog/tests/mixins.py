@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 
-from blog.models import Blog, Comment
+from blog.models import Blog, Comment, PERM
 
 
 class TestDataMixin:
@@ -15,7 +15,7 @@ class TestDataMixin:
         cls.commenter = get_user_model().objects.create_user(username='commenter', password='12345')
 
         # give bloggers blogger permission
-        permission = Permission.objects.get(name='create update and delete blogs')
+        permission = PERM
         cls.user.user_permissions.add(permission)
         cls.user1.user_permissions.add(permission)
         cls.user.bio = 'testuser is a blogger.'
