@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<ul>
+    {% for blog in blogs %}
+        <li><a href="{{ blog.get_absolute_url }}">{{ blog.title }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock content %}

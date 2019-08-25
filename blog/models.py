@@ -1,7 +1,11 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.urls import reverse
 from django.utils.text import slugify
+
+# Constant for the 'blogger' permission
+PERM = Permission.objects.get(codename='blogger')
 
 
 class Blog(models.Model):
@@ -38,7 +42,10 @@ class Comment(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='comments')
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['created_at']
 
     def __str__(self):
-        return self.content[:25]
+        if len(self.content) <= 75:
+            return self.content
+        else:
+            return f'{self.content[:75]}...'

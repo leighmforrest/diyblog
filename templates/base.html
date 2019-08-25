@@ -1,3 +1,4 @@
+{% load socialaccount %}
 <!doctype html>
 <html lang="en">
   <head>
@@ -12,8 +13,30 @@
   </head>
   <body>
     <main class="container">
-        {% block content %}{% endblock %}
+      <div class="row">
+        <div class="col-md-3">
+          <ul>
+              <li><a href='{% url 'pages:home' %}'>Home</a></li>
+              <li><a href='{% url 'blog:blog' %}'>All Blogs</a></li>
+              <li><a href='{% url 'blog:bloggers' %}'>All Bloggers</a></li>
+          </ul>
+          <div>
+              {% if user.is_authenticated %}
+                  <p><span class="font-weight-bold">Username:</span>{{ user.username }}</p>
+                  <p><a href="{% url 'account_logout' %}">Logout</a></p>
+                  {% else %}
+                  <p><a href="{% url 'account_signup' %}">Sign Up</a></p>
+                  <p><a href="{% url 'account_login' %}">Log In</a></p>
+                  <p><a href="{% provider_login_url 'google' %}">Log In with Gmail</a></p>
+              {% endif %}
+          </div>
+        </div>
+        <div class="col-md-9">
+          {% block content %}{% endblock %}
+        </div>
+      </div>
     </main>
+    {% include 'pagination.html' %}
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>

@@ -6,3 +6,4 @@ from django.dispatch import receiver
 
 class CustomUser(AbstractUser):
     bio = models.TextField(blank=True, null=True)
+

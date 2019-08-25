@@ -8,6 +8,8 @@ class TestDataMixin:
     @classmethod
     def setUpTestData(cls):
         # create test users
+        cls.superuser = cls.user = get_user_model().objects.create_superuser(
+            username='clark_kent', email='supes@example.com',password='12345')
         cls.user = get_user_model().objects.create_user(username='testuser', password='12345')
         cls.user1 = get_user_model().objects.create_user(username='scrubby', password='12345')
         cls.commenter = get_user_model().objects.create_user(username='commenter', password='12345')
@@ -16,6 +18,10 @@ class TestDataMixin:
         permission = Permission.objects.get(name='create update and delete blogs')
         cls.user.user_permissions.add(permission)
         cls.user1.user_permissions.add(permission)
+        cls.user.bio = 'testuser is a blogger.'
+        cls.user1.bio = 'scrubby is a blogger.'
+        cls.user.save()
+        cls.user1.save()
 
         # create blog posts
         cls.blog1 = Blog.objects.create(blogger=cls.user, content='x'*128, title='blog post')

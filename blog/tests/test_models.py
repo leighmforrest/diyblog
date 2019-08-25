@@ -27,7 +27,7 @@ class TestBlogModel(TestDataMixin, TestCase):
     
     def test_get_absolute_url(self):
         slug = self.blog.slug
-        url = f'/blog/{slug}'
+        url = f'/blog/{slug}/'
         self.assertEqual(url, self.blog.get_absolute_url())
 
 
@@ -44,5 +44,10 @@ class TestCommentModel(TestDataMixin, TestCase):
         self.assertIsNotNone(self.comment.created_at)
         self.assertIsNotNone(self.comment.updated_at)
     
-    def test_string(self):
-        self.assertEqual(self.comment.content[:25], str(self.comment))
+    def test_long_string(self):
+        self.assertEqual(self.comment.content[:75] + '...', str(self.comment))
+    
+    def test_short_string(self):
+        content = 'Z'*25
+        self.comment.content = content
+        self.assertEqual(content, str(self.comment))
