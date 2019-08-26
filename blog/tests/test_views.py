@@ -100,6 +100,11 @@ class TestCommentCreateView(TestDataMixin, TestCase):
         response = self.client.get(self.url, follow=True)
         self.assertEqual(response.status_code, 200)
     
+    def test_template_used(self):
+        client = self.authenticated_client()
+        response = self.client.get(self.url, follow=True)
+        self.assertTemplateUsed('blog/comment_form.html')
+    
     def test_authenticated_user_can_post(self):
         client = self.authenticated_client()
         count = self.blog1.comments.count()
@@ -121,4 +126,90 @@ class TestCommentCreateView(TestDataMixin, TestCase):
         self.assertEqual(self.blog1.comments.count(), count)
 
 
-        
+class BlogCommentUpdateViewTest(TestDataMixin, TestCase):
+    def setUp(self):
+        self.comment = self.blog1.comments.get(user=self.commenter)
+        self.url = reverse('blog:update_comment', kwargs={'pk': self.comment.pk})
+    
+    def authenticated_client(self):
+        client = Client()
+        client.login(username='commenter', password='12345')
+        return client
+
+    def test_commenter_can_get(self):
+        client = self.authenticated_client()
+        response = client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+    
+    def test_non_commenter_cannot_get(self):
+        client = Client()
+        client.login(username='user1', password='12345')
+        response = client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+    
+    def test_anonymous_user_cannot_get(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_template_used(self):
+        client = self.authenticated_client()
+        response = self.client.get(self.url, follow=True)
+        self.assertTemplateUsed('blog/comment_form.html')
+    
+    def test_commenter_can_update(self):
+        content = 'abc'*32
+        client = self.authenticated_client()
+        response = client.post(self.url, data={'content': content})
+        comment = Comment.objects.get(pk=self.comment.pk)
+        self.assertEqual(comment.content, content)
+    
+    def test_non_commenter_cannot_update(self):
+        client = Client()
+        client.login(username='user1', password='12345')
+        response = client.get(self.url, data={'content': 'abc'})
+        self.assertEqual(response.status_code, 403)
+
+
+class BlogCommentUpdateViewTest(TestDataMixin, TestCase):
+    def setUp(self):
+        self.comment = self.blog1.comments.get(user=self.commenter)
+        self.url = reverse('blog:delete_comment', kwargs={'pk': self.comment.pk})
+    
+    def authenticated_client(self):
+        client = Client()
+        client.login(username='commenter', password='12345')
+        return client
+
+    def test_commenter_can_get(self):
+        client = self.authenticated_client()
+        response = client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+    
+    def test_non_commenter_cannot_get(self):
+        client = Client()
+        client.login(username='user1', password='12345')
+        response = client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+    
+    def test_anonymous_user_cannot_get(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_template_used(self):
+        client = self.authenticated_client()
+        response = self.client.get(self.url, follow=True)
+        self.assertTemplateUsed('blog/delete.html')
+    
+    def test_commenter_can_delete(self):
+        client = self.authenticated_client()
+        response = client.post(self.url, data={})
+        comment = Comment.objects.filter(pk=self.comment.pk)
+        self.assertEqual(len(comment), 0)
+    
+    def test_non_commenter_cannot_delete(self):
+        client = Client()
+        client.login(username='user1', password='12345')
+        response = client.get(self.url, data={})
+        self.assertEqual(response.status_code, 403)
+
+

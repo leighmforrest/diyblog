@@ -1,0 +1,8 @@
+<div>
+    {{ comment.user.username }} ({{ comment.created_at }}) - {{ comment.content }}
+    <br>
+    {% if user == comment.user %}
+    <a href="{% url 'blog:update_comment'  comment.pk %}">Update</a>
+    <a href="{% url 'blog:delete_comment'  comment.pk %}">Delete</a>
+    {% endif %}
+</div>

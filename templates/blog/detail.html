@@ -11,13 +11,7 @@
 <div class="comments">
     <h2>Comments</h2>
     {% for comment in blog.comments.all %}
-        <div>
-            {{ comment.user.username }} ({{ comment.created_at }}) - {{ comment.content }}
-            <br>
-            {% if user == comment.user %}
-            This user can edit the comment.
-            {% endif %}
-        </div>
+        {% include 'partials/comment.html' %}
     {% endfor %}
     {% if user.is_authenticated %}
         <a href="{% url 'blog:create_comment' blog.slug %}">Add a new comment</a>

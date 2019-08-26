@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block  title %}
+Delete Comment
+{% endblock  %}
+
+{% block content %}
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <p>Are you sure you want to delete  "{{ object.content }}"?</p>
+    <button type="submit" class="btn btn-danger">Delete Comment</button>
+</form>
+{% endblock content %}

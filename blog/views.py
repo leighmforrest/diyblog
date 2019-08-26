@@ -1,7 +1,8 @@
 from django.views.generic import ListView, DetailView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.urls import reverse, reverse_lazy
 
@@ -40,7 +41,7 @@ class BloggerDetailView(DetailView):
 
 class CreateCommentView(LoginRequiredMixin, CreateView):
     model = Comment
-    template_name = 'blog/create.html'
+    template_name = 'blog/comment_form.html'
     form_class = CommentForm
 
     def get_success_url(self):
@@ -50,3 +51,40 @@ class CreateCommentView(LoginRequiredMixin, CreateView):
         form.instance.user = self.request.user
         form.instance.blog = Blog.objects.get(slug=str(self.kwargs['slug']))
         return super().form_valid(form)
+
+
+class UpdateCommentView(LoginRequiredMixin, UpdateView):
+    model = Comment
+    template_name = 'blog/comment_form.html'
+    form_class = CommentForm
+
+    def get_success_url(self):
+        comment = self.get_object()
+        return comment.blog.get_absolute_url()
+
+    def form_valid(self, form):
+        comment = self.get_object()
+        form.instance.user = self.request.user
+        form.instance.blog = comment.blog
+        return super().form_valid(form)
+    
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.user != self.request.user:
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
+
+
+class DeleteCommentView(LoginRequiredMixin, DeleteView):
+    model = Comment
+    template_name = 'blog/delete.html'
+
+    def get_success_url(self):
+        comment = self.get_object()
+        return comment.blog.get_absolute_url()
+    
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.user != self.request.user:
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
