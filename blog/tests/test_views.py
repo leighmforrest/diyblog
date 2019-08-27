@@ -1,10 +1,11 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.db.models import Q
 
 from blog.tests.mixins import TestDataMixin
-from blog.models import PERM,Comment
+from blog.models import Comment
 
 
 class BlogListViewTest(TestDataMixin, TestCase):
@@ -54,7 +55,8 @@ class TestBloggerListView(TestDataMixin, TestCase):
     def setUp(self):
         self.url = reverse('blog:bloggers')
         self.response = self.client.get(self.url)
-        self.bloggers = get_user_model().objects.filter(Q(user_permissions=PERM) | Q(is_superuser=True)).distinct()
+        permission = Permission.objects.get(name='create update and delete blogs')
+        self.bloggers = get_user_model().objects.filter(Q(user_permissions=permission) | Q(is_superuser=True)).distinct()
     
     def test_can_get(self):
         self.assertEqual(self.response.status_code, 200)

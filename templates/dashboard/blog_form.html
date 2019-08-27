@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block  title %}
+    {% if update %}
+
+    {% else %}
+    {% endif %}
+{% endblock  %}
+
+{% block content %}
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    {% if update %}
+        <button type="submit" class="btn btn-primary">Edit Blog</button>
+    {% else %}
+        <button type="submit" class="btn btn-primary">Post Blog</button>
+    {% endif %}
+</form>
+{% endblock content %}

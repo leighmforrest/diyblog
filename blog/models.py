@@ -4,9 +4,6 @@ from django.contrib.auth.models import Permission
 from django.urls import reverse
 from django.utils.text import slugify
 
-# Constant for the 'blogger' permission
-PERM = Permission.objects.get(codename='blogger')
-
 
 class Blog(models.Model):
     title = models.CharField(max_length=64)

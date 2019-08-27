@@ -1,12 +1,13 @@
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.urls import reverse, reverse_lazy
 
-from .models import Blog, Comment, PERM
+from .models import Blog, Comment
 from .forms import CommentForm
 
 
@@ -28,7 +29,8 @@ class BloggerListView(ListView):
     template_name = 'blog/bloggers.html'
 
     def get_queryset(self):
-        return get_user_model().objects.filter(Q(user_permissions=PERM) | Q(is_superuser=True)).distinct()
+        permission = Permission.objects.get(name='create update and delete blogs')
+        return get_user_model().objects.filter(Q(user_permissions=permission) | Q(is_superuser=True)).distinct()
 
 
 class BloggerDetailView(DetailView):
@@ -36,7 +38,8 @@ class BloggerDetailView(DetailView):
     template_name = 'blog/blogger.html'
     
     def get_queryset(self):
-        return get_user_model().objects.filter(Q(user_permissions=PERM) | Q(is_superuser=True), pk=self.kwargs['pk'])
+        permission = Permission.objects.get(name='create update and delete blogs')
+        return get_user_model().objects.filter(Q(user_permissions=permission) | Q(is_superuser=True), pk=self.kwargs['pk'])
 
 
 class CreateCommentView(LoginRequiredMixin, CreateView):

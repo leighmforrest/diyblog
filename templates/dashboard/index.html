@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Dashboard</h1>
+<table>
+    <tr>
+        <th>Blogs</th>
+        <th>Edit</th>
+        <th>Delete</th>
+    </tr>
+    {% for blog in blogs %}
+    <tr>
+        <td>{{ blog.title }}</td>
+        <td><a href="{% url 'dashboard:update_blog' blog.slug %}">Edit</a></td>
+        <td>
+        <form action="{% url 'dashboard:delete_blog' blog.slug %}" method="post" class="delete_button">
+            {% csrf_token %}
+            <button type="submit">Delete</button>
+        </form>
+    </tr>
+    {% endfor %}
+</table>
+<a href="{% url 'dashboard:create_blog' %}" class="btn btn-primary">Create Blog</a>
+{% endblock content %}
