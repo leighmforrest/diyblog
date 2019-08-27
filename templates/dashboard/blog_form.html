@@ -3,12 +3,18 @@
 
 {% block  title %}
     {% if update %}
-
+    Update Blog
     {% else %}
+    Create Blog
     {% endif %}
 {% endblock  %}
 
 {% block content %}
+{% if update %}
+    <h1>Update Blog</h1>
+{% else %}
+    <h1>Create Blog</h1>
+{% endif %}
 <form action="" method="post">
     {% csrf_token %}
     {{ form|crispy }}

@@ -1,24 +1,30 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Dashboard</h1>
-<table>
+<h1 class="text-center">Dashboard</h1>
+<table class="table table-sm">
+  <thead class="thead-dark">
     <tr>
-        <th>Blogs</th>
-        <th>Edit</th>
-        <th>Delete</th>
+      <th scope="col">Blog</th>
+      <th scope="col">Update</th>
+      <th scope="col">Delete</th>
     </tr>
+  </thead>
+  <tbody>
     {% for blog in blogs %}
     <tr>
-        <td>{{ blog.title }}</td>
+        <td><a href="{{ blog.get_absolute_url }}">{{ blog.title }}</a></td>
         <td><a href="{% url 'dashboard:update_blog' blog.slug %}">Edit</a></td>
         <td>
-        <form action="{% url 'dashboard:delete_blog' blog.slug %}" method="post" class="delete_button">
-            {% csrf_token %}
-            <button type="submit">Delete</button>
-        </form>
+            <form action="{% url 'dashboard:delete_blog' blog.slug %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="delete_button"><i class="fa fa-trash" aria-hidden="true"></i>
+</button>
+            </form>
+        </td>
     </tr>
     {% endfor %}
+   </tbody>
 </table>
 <a href="{% url 'dashboard:create_blog' %}" class="btn btn-primary">Create Blog</a>
 {% endblock content %}

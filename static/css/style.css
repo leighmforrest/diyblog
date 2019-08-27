@@ -1,11 +1,15 @@
-.delete_button {
-    background: none!important;
-    border: none;
-    padding: 0!important;
-    /*optional*/
-    font-family: arial, sans-serif;
-    /*input has OS specific font-family*/
-    color: #069;
-    text-decoration: underline;
-    cursor: pointer;
+tr td{
+    padding: 5px;
+    margin: 5px;
+  }
+button {
+	font-family: "Verdana" sans-serif;
+	font-size: 1em;
+	text-align: left;
+	color: #007bff;
+	background: none;
+	margin: 0;
+	padding: 0;
+	border: none;
+	cursor: pointer;
 }
