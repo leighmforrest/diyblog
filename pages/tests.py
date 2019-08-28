@@ -14,7 +14,8 @@ class TestHomepageTest(TestDataMixin, TestCase):
         self.assertTemplateUsed(self.response, 'pages/index.html')
     
     def test_blogger_link_rendered(self):
-        self.assertTrue('All Bloggers' in str(self.response.content))
+        content = str(self.response.content)
+        self.assertTrue('All Bloggers' in content)
 
     def test_login_links_rendered(self):
         response_text = str(self.response.content)
@@ -26,5 +27,11 @@ class TestHomepageTest(TestDataMixin, TestCase):
         client.login(username='commenter', password='12345')
         response = str(client.get(reverse('pages:home')).content)
         self.assertTrue('<span class="font-weight-bold">Username:</span>commenter</p>' in response)
+    
+    def test_dashboard_in_blogger_nav_links(self):
+        client = Client()
+        client.login(username='scrubby', password='12345')
+        response = str(client.get(reverse('pages:home')).content)
+        self.assertTrue('<a href="/dashboard/">Dashboard</a>' in response)
 
 

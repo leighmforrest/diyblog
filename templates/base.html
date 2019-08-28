@@ -26,6 +26,9 @@
           <div>
               {% if user.is_authenticated %}
                   <p><span class="font-weight-bold">Username:</span>{{ user.username }}</p>
+                  {% if perms.blog.blogger %}
+                  <p><a href="{% url 'dashboard:index' %}">Dashboard</a></p>
+                  {% endif %}
                   <p><a href="{% url 'account_logout' %}">Logout</a></p>
                   {% else %}
                   <p><a href="{% url 'account_signup' %}">Sign Up</a></p>
