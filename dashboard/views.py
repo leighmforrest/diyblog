@@ -2,6 +2,9 @@ from django.views.generic import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.contrib.auth import get_user_model
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.urls import reverse_lazy
 
 from blog.models import Blog
@@ -20,12 +23,13 @@ class BlogListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         return blogger.blogs.all()
 
 
-class BlogCreateView(LoginRequiredMixin, CreateView):
+class BlogCreateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     model = Blog
     template_name = 'dashboard/blog_form.html'
     permission_required = 'blog.blogger'
     form_class = BlogForm
     success_url = reverse_lazy('dashboard:index')
+    success_message = 'The blog has been created.'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -37,12 +41,13 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class BlogUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+class BlogUpdateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Blog
     template_name = "dashboard/blog_form.html"
     permission_required = 'blog.blogger'
     form_class = BlogForm
     success_url = reverse_lazy('dashboard:index')
+    success_message = "The blog has been updated."
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -61,9 +66,10 @@ class BlogUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
 
 
 
-class BlogDeleteView(DeleteView):
+class BlogDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Blog
     http_method_names = ['post']
+    permission_required = 'blog.blogger'
     success_url = reverse_lazy('dashboard:index')
 
     def dispatch(self, request, *args, **kwargs):
@@ -71,5 +77,10 @@ class BlogDeleteView(DeleteView):
         if obj.blogger != self.request.user:
             raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)
+    
+    def delete(self, request, *args, **kwargs):
+        message = f"The blog has been deleted."
+        messages.warning(self.request, message)
+        return super().delete(request, *args, **kwargs)
 
 

@@ -2,6 +2,8 @@ from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
@@ -42,10 +44,11 @@ class BloggerDetailView(DetailView):
         return get_user_model().objects.filter(Q(user_permissions=permission) | Q(is_superuser=True), pk=self.kwargs['pk'])
 
 
-class CreateCommentView(LoginRequiredMixin, CreateView):
+class CreateCommentView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Comment
     template_name = 'blog/comment_form.html'
     form_class = CommentForm
+    success_message = 'The comment has been created.'
 
     def get_success_url(self):
         return reverse('blog:detail', args=[self.kwargs['slug']])
@@ -56,10 +59,11 @@ class CreateCommentView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class UpdateCommentView(LoginRequiredMixin, UpdateView):
+class UpdateCommentView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Comment
     template_name = 'blog/comment_form.html'
     form_class = CommentForm
+    success_message = 'The blog has been updated.'
 
     def get_success_url(self):
         comment = self.get_object()
@@ -91,3 +95,8 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
         if obj.user != self.request.user:
             raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)
+    
+    def delete(self, request, *args, **kwargs):
+        message = f"The comment has been deleted."
+        messages.warning(self.request, message)
+        return super().delete(request, *args, **kwargs)

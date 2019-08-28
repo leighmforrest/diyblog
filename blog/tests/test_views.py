@@ -114,6 +114,19 @@ class TestCommentCreateView(TestDataMixin, TestCase):
         self.assertRedirects(response, self.blog1.get_absolute_url())
         self.assertEqual(self.blog1.comments.count(), count + 1)
     
+    def test_create_success_message(self):
+        expected_message = 'The comment has been created.'
+        client = self.authenticated_client()
+        response = client.post(self.url, data={'content': 'z'*256}, follow=True)
+
+        self.assertIn(expected_message.encode('utf-8'), response.content)
+
+        messages = list(response.context['messages'])
+        self.assertIn(expected_message.encode('utf-8'), response.content)
+
+        for message in messages:
+            self.assertEqual(str(message), expected_message)
+    
     def test_authenticated_user_cannot_post_too_big(self):
         client = self.authenticated_client()
         count = self.blog1.comments.count()
@@ -165,6 +178,20 @@ class BlogCommentUpdateViewTest(TestDataMixin, TestCase):
         comment = Comment.objects.get(pk=self.comment.pk)
         self.assertEqual(comment.content, content)
     
+    def test_update_success_message(self):
+        expected_message = 'The blog has been updated.'
+        content = 'abc'*32
+        client = self.authenticated_client()
+        response = client.post(self.url, data={'content': content}, follow=True)
+
+        self.assertIn(expected_message.encode('utf-8'), response.content)
+
+        messages = list(response.context['messages'])
+        self.assertIn(expected_message.encode('utf-8'), response.content)
+
+        for message in messages:
+            self.assertEqual(str(message), expected_message)
+    
     def test_non_commenter_cannot_update(self):
         client = Client()
         client.login(username='user1', password='12345')
@@ -172,7 +199,7 @@ class BlogCommentUpdateViewTest(TestDataMixin, TestCase):
         self.assertEqual(response.status_code, 403)
 
 
-class BlogCommentUpdateViewTest(TestDataMixin, TestCase):
+class BlogCommentDeleteViewTest(TestDataMixin, TestCase):
     def setUp(self):
         self.comment = self.blog1.comments.get(user=self.commenter)
         self.url = reverse('blog:delete_comment', kwargs={'pk': self.comment.pk})
@@ -204,9 +231,22 @@ class BlogCommentUpdateViewTest(TestDataMixin, TestCase):
     
     def test_commenter_can_delete(self):
         client = self.authenticated_client()
-        response = client.post(self.url, data={})
+        response = client.post(self.url)
         comment = Comment.objects.filter(pk=self.comment.pk)
         self.assertEqual(len(comment), 0)
+    
+    def test_delete_success_message(self):
+        expected_message = 'The comment has been deleted.'
+        client = self.authenticated_client()
+        response = client.post(self.url, follow=True)
+
+        self.assertIn(expected_message.encode('utf-8'), response.content)
+
+        messages = list(response.context['messages'])
+        self.assertIn(expected_message.encode('utf-8'), response.content)
+
+        for message in messages:
+            self.assertEqual(str(message), expected_message)
     
     def test_non_commenter_cannot_delete(self):
         client = Client()
